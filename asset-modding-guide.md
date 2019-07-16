@@ -74,7 +74,7 @@ Here we can see quite a few files, some with extensions, some without. That's ok
 
 ## Step 2 - Finding which assets to change
 
-This (along with step 3) are the hardest steps because they involve a lot of digging through the assets and moderate understanding of how the game functions.
+This (along with step 3) are the hardest steps because they involve a lot of digging through the assets and require a moderate understanding of how the game functions.
 
 First up, open up UABE. You can do this by running the AssetBundleExtractor executable located in the release, under the `32bit` folder that you hopefully downloaded at the beginning of this guide.
 
