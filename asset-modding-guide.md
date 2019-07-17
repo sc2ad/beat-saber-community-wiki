@@ -164,7 +164,7 @@ Once providing the necessary DLLs, the asset window will open, which will appear
 
 Expanding the + arrow will show you something similar to the following:
 
-![UABE ColorManager Expanded](/uploads/asset-modding/12_uabe_colormanager_expanded.png, "UABE ColorManager Expanded")
+![UABE ColorManager Expanded](/uploads/asset-modding/12_uabe_colormanager_expanded.png "UABE ColorManager Expanded")
 
 Before we take a look at what we can see, let's talk about this magical thing that is a `PPtr`!
 Put simply: It's a pointer to another asset.
