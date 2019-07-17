@@ -28,10 +28,13 @@ An asset mod is called an asset mod because, well, it modifies the assets (who w
 However, what this means is that anything dynamic (where it changes during the game) _cannot be modified by an asset mod_. For example, Sc2ad's HitScoreVisualizer is only possible as a hook mod, not as an asset mod. This is because it is _impossible_ to change anything in the assets that lets us change the color of the text that is displayed when we cut a block, because it is simply not loaded from the assets.
 When in doubt, if it ever changes in the game, it probably isn't asset moddable. However, if it _doesn't_ change in the game, it likely _is_ asset moddable. Hopefully that makes sense.
 
+Another example to look at is custom sabers. Sabers stay the same throughout the entirety of your play session (they are static). This allows them to be modified via asset modding.
+In comparison, text is dynamic and always changing during the game. Your points for each saber cut is dynamic requiring a hook mod.
+
 ## Mod Introduction
 
 Now that I have hopefully cleared up some possible misconceptions, let's begin!
-Let's begin! My goal in this guide will be to create a small asset mod that allows me to set my saber colors to specific colors. Think: Custom Colors, but without changing the colors in the background.
+My goal in this guide will be to create a small asset mod that allows me to set my saber colors to specific colors. Think: Custom Colors, but without changing the colors in the background.
 Our goal will hopefully look something like this:
 
 ![Modding Goal](/uploads/asset-modding/00_custom_colors_goal.png "Custom Colors Goal")
@@ -49,6 +52,9 @@ Well, let's break this task down into steps:
 4. Package our changed assets and create a mod for us to load with BeatOn
 
 Let's start with the 0th step: backups. Because of how annoying it is to pull the APK (and because it is good practice) we should create a backup.
+
+######Tip: Here's a nifty command for pulling the base apk: `adb pull /data/app/com.beatgames.beatsaber-1/base.apk`
+
 We can do this simply by copying the APK and renaming it from `base.apk` to something like `base_bkp.apk` or anything you want, really. The important thing here is to make sure you **NEVER TOUCH YOUR BACKUP!** Which should go without saying.
 
 ## Step 1 - Getting the assets from the APK
@@ -71,7 +77,7 @@ Here we can see quite a few files, some with extensions, some without. That's ok
 
 ## Step 2 - Finding which assets to change
 
-This (along with step 3) are the hardest steps because they involve a lot of digging through the assets and moderate understanding of how the game functions.
+This (along with step 3) are the hardest steps because they involve a lot of digging through the assets and require a moderate understanding of how the game functions.
 
 First up, open up UABE. You can do this by running the AssetBundleExtractor executable located in the release, under the `32bit` folder that you hopefully downloaded at the beginning of this guide.
 
