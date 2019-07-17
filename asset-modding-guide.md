@@ -52,6 +52,9 @@ Well, let's break this task down into steps:
 4. Package our changed assets and create a mod for us to load with BeatOn
 
 Let's start with the 0th step: backups. Because of how annoying it is to pull the APK (and because it is good practice) we should create a backup.
+
+######Tip: Here's a nifty command for pulling the base apk: `adb pull /data/app/com.beatgames.beatsaber-1/base.apk`
+
 We can do this simply by copying the APK and renaming it from `base.apk` to something like `base_bkp.apk` or anything you want, really. The important thing here is to make sure you **NEVER TOUCH YOUR BACKUP!** Which should go without saying.
 
 ## Step 1 - Getting the assets from the APK
