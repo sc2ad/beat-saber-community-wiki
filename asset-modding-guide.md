@@ -28,13 +28,13 @@ An asset mod is called an asset mod because, well, it modifies the assets (who w
 However, what this means is that anything dynamic (where it changes during the game) _cannot be modified by an asset mod_. For example, Sc2ad's HitScoreVisualizer is only possible as a hook mod, not as an asset mod. This is because it is _impossible_ to change anything in the assets that lets us change the color of the text that is displayed when we cut a block, because it is simply not loaded from the assets.
 When in doubt, if it ever changes in the game, it probably isn't asset moddable. However, if it _doesn't_ change in the game, it likely _is_ asset moddable. Hopefully that makes sense.
 
-__Yuuki:__ Another example to look at is custom sabers. Sabers stay the same throughout the entirety of your play session (they are static). This allows them to be modified via asset modding.
+Another example to look at is custom sabers. Sabers stay the same throughout the entirety of your play session (they are static). This allows them to be modified via asset modding.
 In comparison, text is dynamic and always changing during the game. Your points for each saber cut is dynamic requiring a hook mod.
 
 ## Mod Introduction
 
 Now that I have hopefully cleared up some possible misconceptions, let's begin!
-__Yuuki:__  ~~Let's begin!~~ My goal in this guide will be to create a small asset mod that allows me to set my saber colors to specific colors. Think: Custom Colors, but without changing the colors in the background.
+My goal in this guide will be to create a small asset mod that allows me to set my saber colors to specific colors. Think: Custom Colors, but without changing the colors in the background.
 Our goal will hopefully look something like this:
 
 ![Modding Goal](/uploads/asset-modding/00_custom_colors_goal.png "Custom Colors Goal")
