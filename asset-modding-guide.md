@@ -49,7 +49,7 @@ So... how do we even start?
 
 Well, let's break this task down into steps:
 
-1. [Get the assets files from the APK](##step--1--getting-the-assets-from-the-apk)
+1. [Get the assets files from the APK](##step-1---getting-the-assets-from-the-apk)
 
 2. [Find which assets we want to change](#step-2-find-which-assets-to-change)
 
