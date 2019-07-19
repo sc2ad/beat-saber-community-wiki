@@ -243,9 +243,11 @@ Looks like we have found the assets we want to modify! Let's go on to the next s
 ### If you do not have access to the PC DLLs
 
 Oh boy. I hope you have a hex editor installed, because things are about to get super messy.
+
 Because you don't have access to the DLLs, _and_ we are attempting to mod a MonoBehaviour (which only exists in the DLLs, it's not Unity generic) we will need to resort to some rather complicated stuff.
 
 Make sure you have the ColorManager selected in UABE and click `Export Raw`. Save this to a location that you won't forget immediately. You can choose to rename it or simply leave it as its default name, but _don't lose it!_
+
 Now, open up your hex editor and take a look. It'll probably look something similar to this: (I use the Hexdump extension in Visual Studio Code)
 
 ![ColorManager HexDump](/uploads/asset-modding/15_colormanager_hexdump.png "ColorManager Hexdump")
@@ -262,18 +264,25 @@ Unity stores MonoBehaviours in a slightly special way: They have 4 initial field
 * `string m_Name`: The name of the MonoBehaviour.
 
 Let's talk about this magical thing that is a `PPtr`!
+
 Put simply: It's a pointer to another asset.
+
 Put longly: It's pairing of an unsigned integer representing the file location (aka FileID), and an unsigned long representing the PathID of another asset.
+
 A PPtr also will provide the type of which it points to, if UABE knows it, which is provided inside the <>. A $ at the front of the type indicates that the type is a MonoBehaviour, and not a Unity specific object.
+
 Another thing to note is that a PPtr is exactly 12 bytes long (the first 4 bytes represent the FileID, the last 8 bytes represent the PathID).
 
 A string is not null terminated like in C, instead strings are stored in the assets with their length first, followed by a single byte (UTF8) for each of the characters in the string.
+
 So, let's dissect our .dat file:
+
 The first 12 bytes are taken up by the `m_GameObject` PPtr, and are selected:
 
 ![ColorManager Dump GameObject](/uploads/asset-modding/16_colormanager_dump_gameobject.png "ColorManager Hexdump of GameObject PPtr")
 
 The next byte is taken up by the `m_Enabled` UInt8 (or boolean), which is a 0. However, Unity stores all objects with an alignment of 4. What this means is that for any operation that results in the end position not being a multiple of 4 (end position mod 4 != 0), then 0s are added until the position is a multiple of 4.
+
 What this means for the UInt8 is that instead of it taking up 1 byte, as it normally does, it takes up 1 byte + 3 additional 0 bytes. So, the data that represents the `m_Enabled` boolean is actually as follows:
 
 ![ColorManager Dump Enabled](/uploads/asset-modding/17_colormanager_dump_enabled.png "ColorManager Hexdump of Enabled bool")
@@ -293,8 +302,11 @@ The first 4 bytes represent a length of 12, which means that the entire string t
 
 Now that we have finished the 4 fields that all MonoBehaviours have, what is the rest of the binary data?
 Because Unity is, well, Unity, it stores any and all Serializable fields that aren't structs as PPtrs. What this means is that in a MonoBehaviour that contains Serializable fields that are of types that aren't structs (such as our ColorManager, with fields like `_playerModel`, `_colorA`, and `_colorB`) they are stored as PPtrs.
+
 So we know that the remaining 36 bytes are all PPtrs. However, which one is which?
+
 Fortunately, this is as easy as reading from the top, down in dnSpy. This is because Unity uses reflection to know how and what to store in the assets files, so because `_playerModel` comes before `_colorA` which comes before `_colorB`, that is exactly the order in which they are stored.
+
 So, we know that `_colorA` is a PPtr to: `(FID: 0, PID: 60)` and `_colorB` is a PPtr to: `(FID: 0, PID: 59)`
 Looks like we have found the assets we want to modify! Let's go on to the next step!
 
@@ -328,9 +340,13 @@ You are now ready for the next and final step!
 ### If you do not have access to the PC DLLs
 
 Once again, be prepared for a world of pain.
+
 Because you know where the assets are from the previous step, you need to find the filename the colors are saved in. Because we know the `FID: 0` for both PPtrs from our exploration of the .dat file of our ColorManager, we know that the colors we are looking for are in the same file as the ColorManager.
+
 So, if we look in UABE for the ColorManager, we can see that its FID is 121. Now we can get the filename from this by clicking View --> Dependencies and searching for the prefix 121. In Beat Saber 1.1.0, `FID: 121` corresponds to the filename: `sharedassets1.assets`.
+
 Now we can find our color assets in UABE. We can do this by following the PPtrs we already found, and by clicking View --> Go to asset. Search for `sharedassets1.assets` and enter the PathID of either color PPtr to find them.
+
 Now we need to edit these colors. We can do so by exporting each color as a raw. Call these .dat files `ColorA.dat` and `ColorB.dat` respectively. Because each "color" is actually a `SimpleColorSO`, it is a MonoBehaviour. We can also look in dnSpy to see that `SimpleColorSO` contains one field: A struct for color. This struct contains 4 floats (singles), R, G, B, and A. Taking into account the header bytes because of the fact that this asset is a MonoBehaviour, I have the following RGBA for my `_colorB`:
 
 ![Dump ColorB](/uploads/asset-modding/21_dump_colorb.png "Dump of ColoB")
