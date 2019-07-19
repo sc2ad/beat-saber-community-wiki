@@ -51,11 +51,11 @@ So... how do we even start?
 
 1. [Get the assets files from the APK](#step-1---getting-the-assets-from-the-apk)
 
-2. [Find which assets we want to change](#step-2---find-which-assets-to-change)
+2. [Find which assets we want to change](#step-2---finding-which-assets-to-change)
 
 3. [Create our changed assets](#step-3---creating-our-changed-assets)
 
-4. [Package our changed assets and create a mod for us to load with BeatOn](step-4---package-our-changed-assets-into-a-beaton-mod)
+4. [Package our changed assets and create a mod for us to load with BeatOn](#step-4---package-our-changed-assets-into-a-beaton-mod)
 
 Let's start with the 0th step: backups. Because of how annoying it is to pull the APK (and because it is good practice) we should create a backup.
 
