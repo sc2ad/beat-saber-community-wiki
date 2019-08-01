@@ -21,7 +21,9 @@ Because you haven't left yet, I'm going to assume you are actually interested in
 
 * IL2CPP Dumper, either [mine](https://github.com/sc2ad/Il2CppDumper/releases/) (which supports proper dumping of struct field offsets) or [Perfare's](https://github.com/Perfare/Il2CppDumper/releases) (which is the main repo).
 
-* [ndk](https://developer.android.com/ndk/downloads) Which you will use for compiling your mod, download the latest release.
+* [NDK](https://developer.android.com/ndk/downloads) Which you will use for compiling your mod, download the latest release.
+
+* [ADB](https://developer.android.com/studio/releases/platform-tools.html) Which you will use for viewing logs, among other various functions
 
 * [dnSpy](https://github.com/0xd4d/dnSpy/releases) Which you will use for analyzing and decompiling the game code to more legible C#
 
@@ -109,7 +111,7 @@ include $(CLEAR_VARS)
 LOCAL_LDLIBS := -llog
 LOCAL_CFLAGS    := -DMOD_ID='"TemplateMod"' -DVERSION='"0.0.1"'
 LOCAL_MODULE    := templatemod
-LOCAL_CPPFLAGS := -std=c++17
+LOCAL_CPPFLAGS := -std=c++2a
 LOCAL_SRC_FILES := main.cpp ../beatsaber-hook/shared/utils/utils.cpp ../beatsaber-hook/shared/inline-hook/inlineHook.c ../beatsaber-hook/shared/inline-hook/relocate.c
 include $(BUILD_SHARED_LIBRARY)
 ```
@@ -126,7 +128,7 @@ And now we have a key known as `LOCAL_CFLAGS`, which is incredibly important. Wi
 
 `LOCAL_MODULE` is fairly straightforward; it's just the name of the library you are building. Once built, NDK will automatically prefix your .so with `lib`, so in this case, after a successful build, the resultant .so would be: `libtemplatemod.so`
 
-`LOCAL_CPPFLAGS` incidate what C++ flags to use. In this case, we are telling the C++ compiler to compile using C++17.
+`LOCAL_CPPFLAGS` incidate what C++ flags to use. In this case, we are telling the C++ compiler to compile using C++20.
 
 `LOCAL_SRC_FILES` is the 'meat' of the mod, which tells NDK which files to actually compile into a .so. You may notice some files that we haven't talked about yet, such as any of the `../beatsaber-hook` files. We will talk about these files (and how to obtain them) in the next step.
 
@@ -163,6 +165,31 @@ Now, in the directory that you ran IL2CPP Dumper, there should be a folder calle
 Next, make sure you have dnSpy downloaded and open up all of the assemblies in the `DummyDll` folder from IL2CPP Dumper. Also, if you have access to the PC DLLs, open those too. You can find the PC DLLs under `BeatSaber_Data/Managed` under your main Beat Saber directory.
 
 The reason we want both `DummyDll` and `dump.cs` open is because `dump.cs` does not properly write out each attribute, whereas `DummyDll` does.
+
+### Utils
+
+Next, let's go ahead and set up our utilities for actually hooking and whatnot. To do this, I _strongly_ recommend setting up a git repo where your template `Android.mk`, `Application.mk`, `main.cpp` and build scripts are within a folder on the root of the repo (call it, say, `templatemod`).
+
+Next, you want to add a submodule with: `https://github.com/sc2ad/beatsaber-hook.git` and initialize it recursively. If you aren't using git for this, you can simply download a .zip and extract it from [this link](https://github.com/sc2ad/beatsaber-hook) and place it in your root project directory.
+
+### IL2CPP Headers
+
+
+
+### Syntax Highlighting (Visual Studio Code)
+
+Because I like using Visual Studio Code, I will be covering how to set up syntax highlighting and include paths in order to make sure you can spot some compile errors before you attempt to build.
+
+Inside VSC, press ctrl-shift-p to bring up the command window and find C/C++ edit configurations (JSON). Make sure you have the C/C++ extension installed. This will open a JSON window. You will want to add your NDK to the `includePath` directory, `path/to/my/ndk-bundle/**`. Next, change the `cppStandard` value to `"c++17"`, or if it doesn't exist, make it and set it to that. For `intelliSenseMode`, change it to `"gcc-x64"`. This will hopefully show you compile errors now.
+
+You can double check by opening `main.cpp` which should have no compile errors, except for `log`. To resolve the `log` compile error, you can add to definitions _before_ including `../beatsaber-hook/shared/utils/utils.h`:
+
+```cpp
+#define MOD_ID "TemplateMod"
+#define VERSION "1.0.0"
+```
+
+by now, you should be able to build your template mod without any issue!
 
 ## Mod Introduction
 
@@ -232,11 +259,81 @@ An important thing to note is that when hooking functions, it isn't important th
 
 #### Hook Creation
 
-Now that you hopefully have a better understanding, this code should make _some_ sense, but I'll walk you through it anyways.
+Now that you hopefully have a better understanding, this code should make _some_ sense, but I'll walk you through it anyways. This is from the template.
 
 ```cpp
+#define StretchableCube_Awake_offset 0x12F05D4
 
+MAKE_HOOK(StretchableCube_Awake, StretchableCube_Awake_offset, void, void* self) {
+    log(DEBUG, "Called StretchableCube.Awake!");
+    StretchableCube_Awake(self);
+}
 ```
+
+First, we define an offset which we will need for making our hook. This is good practice, because when a new version is released, offsets will most likely be outdated and require changing. Having them at the top, or somewhere consistent will help you change these and avoid headaches.
+
+Next, we call the MAKE_HOOK macro, which requires us to speccify a name of the function we are hooking (can be any name we desire), the offset of the function, the return value (can be void), and the arguments (or none if there are no arguments)
+
+So, what we have done above is create a hook called `StretchableCube_Awake` at the offset `0x12F05D4`, with a `void` return type, and one parameter `void* self`. Recall that the thing that matters when making hooks with parameters is that the _size_ of the parameters must match the original function. In this case, we are simply saying: "I want to hook a function at offset 0x12F05D4, which has a return type of void, and a single parameter which is 4 bytes long. I want to call this original function StretcableCube_Awake".
+
+Inside of the hook, we can see that we log before calling `StretchableCube_Awake` and then we call the original method. When running this mod in game, every time a wall (which uses StretchableCube) is 'awoken' we will see some output in our log, which we can view by doing: `adb shell "logcat |grep 'QuestHook'"`
+
+Now, let's write something similar that will hook into the `get_colorA` of ColorManager, as well as the `get_colorB` of ColorManager:
+
+```cpp
+#include <android/log.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <linux/limits.h>
+#include <sys/sendfile.h>
+#include <sys/stat.h>
+
+#define MOD_ID "CustomColorsMod"
+#define VERSION "0.0.1"
+
+#include "../beatsaber-hook/shared/inline-hook/inlineHook.h"
+#include "../beatsaber-hook/shared/utils/utils.h"
+
+using namespace std;
+
+#define ColorManager_get_colorA_offset 0x130C350
+#define ColorManager_get_colorB_offset 0x130C4A8
+
+MAKE_HOOK(ColorManager_get_colorA, ColorManager_get_colorA_offset, Color, void* self) {
+    log(DEBUG, "Called ColorManager.get_colorA!);
+    return ColorManager_get_colorA(self);
+}
+MAKE_HOOK(ColorManager_get_colorB, ColorManager_get_colorB_offset, Color, void* self) {
+    log(DEBUG, "Called ColorManager.get_colorB!);
+    return ColorManager_get_colorB(self);
+}
+```
+
+Color is an already defined struct in `../beatsaber-hook/shared/utils/typedefs.h`. Normally, you will have to create the structs yourself, but for some common structs, such as `Color`, `Vector3`, and `Vector2`, they are already defined. You are welcome to look at the `typedefs.h` file to see all of the defined structures, as this guide may not be always up to date.
+
+Next, let's actually _install_ these hooks. Just because we have defined them doesn't mean we have installed them. In fact, we want to install our hooks only once we know that libil2cpp.so has actually been opened. Fortunately, this is as simple as putting some `INSTALL_HOOK` calls in the `__attribute__((constructor)) void lib_main()` call. Go ahead and add this to our main.cpp file:
+
+```cpp
+__attribute__((constructor)) void lib_main()
+{
+    log(INFO, "Installing CustomColors hooks...");
+    log(DEBUG, "Installing ColorManager.get_colorA hook!");
+    INSTALL_HOOK(ColorManager_get_colorA);
+    log(DEBUG, "Installing ColorManager.get_colorB hook!);
+    INSTALL_HOOK(ColorManager_get_colorB);
+    log(INFO, "Completed installing hooks!");
+}
+```
+
+Now, we have code that will create a mod that will log whenever we call our colors!
+
+
+
 
 First, I want to start by clarifying what an asset mod _is_ and what makes it different from a hook mod.
 An asset mod is called an asset mod because, well, it modifies the assets (who would have guessed?)
