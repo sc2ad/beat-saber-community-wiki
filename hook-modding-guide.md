@@ -170,7 +170,7 @@ The reason we want both `DummyDll` and `dump.cs` open is because `dump.cs` does 
 
 Next, let's go ahead and set up our utilities for actually hooking and whatnot. To do this, I _strongly_ recommend setting up a git repo where your template `Android.mk`, `Application.mk`, `main.cpp` and build scripts are within a folder on the root of the repo (call it, say, `templatemod`).
 
-Next, you want to add a submodule with: `https://github.com/sc2ad/beatsaber-hook.git` and [initialize it recursively](https://www.vogella.com/tutorials/GitSubmodules/article.html#submodules_trackbranch). If you aren't using git for this, you can simply download a .zip and extract it from [this link](https://github.com/sc2ad/beatsaber-hook) and place it in your root project directory.
+Next, you want to add a submodule with: `https://github.com/sc2ad/beatsaber-hook.git` and [initialize it recursively](https://www.vogella.com/tutorials/GitSubmodules/article.html#submodules_trackbranch) (`git submodule update --init --recursive`). If you aren't using git for this, you can simply download a .zip and extract it from [this link](https://github.com/sc2ad/beatsaber-hook) and place it in your root project directory.
 
 ### IL2CPP Headers
 
@@ -265,7 +265,7 @@ Now that you hopefully have a better understanding, this code should make _some_
 #define StretchableCube_Awake_offset 0x12F05D4
 
 MAKE_HOOK(StretchableCube_Awake, StretchableCube_Awake_offset, void, void* self) {
-    log(DEBUG, "Called StretchableCube.Awake!");
+    log("Called StretchableCube.Awake!");
     StretchableCube_Awake(self);
 }
 ```
@@ -305,11 +305,11 @@ using namespace std;
 #define ColorManager_get_colorB_offset 0x130C4A8
 
 MAKE_HOOK(ColorManager_get_colorA, ColorManager_get_colorA_offset, Color, void* self) {
-    log(DEBUG, "Called ColorManager.get_colorA!);
+    log("Called ColorManager.get_colorA!);
     return ColorManager_get_colorA(self);
 }
 MAKE_HOOK(ColorManager_get_colorB, ColorManager_get_colorB_offset, Color, void* self) {
-    log(DEBUG, "Called ColorManager.get_colorB!);
+    log("Called ColorManager.get_colorB!);
     return ColorManager_get_colorB(self);
 }
 ```
@@ -321,12 +321,12 @@ Next, let's actually _install_ these hooks. Just because we have defined them do
 ```cpp
 __attribute__((constructor)) void lib_main()
 {
-    log(INFO, "Installing CustomColors hooks...");
-    log(DEBUG, "Installing ColorManager.get_colorA hook!");
+    log("Installing CustomColors hooks...");
+    log("Installing ColorManager.get_colorA hook!");
     INSTALL_HOOK(ColorManager_get_colorA);
-    log(DEBUG, "Installing ColorManager.get_colorB hook!);
+    log("Installing ColorManager.get_colorB hook!);
     INSTALL_HOOK(ColorManager_get_colorB);
-    log(INFO, "Completed installing hooks!");
+    log("Completed installing hooks!");
 }
 ```
 
