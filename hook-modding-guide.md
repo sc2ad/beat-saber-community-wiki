@@ -170,7 +170,7 @@ The reason we want both `DummyDll` and `dump.cs` open is because `dump.cs` does 
 
 Next, let's go ahead and set up our utilities for actually hooking and whatnot. To do this, I _strongly_ recommend setting up a git repo where your template `Android.mk`, `Application.mk`, `main.cpp` and build scripts are within a folder on the root of the repo (call it, say, `templatemod`).
 
-Next, you want to add a submodule with: `https://github.com/sc2ad/beatsaber-hook.git` and initialize it recursively. If you aren't using git for this, you can simply download a .zip and extract it from [this link](https://github.com/sc2ad/beatsaber-hook) and place it in your root project directory.
+Next, you want to add a submodule with: `https://github.com/sc2ad/beatsaber-hook.git` and [initialize it recursively](https://www.vogella.com/tutorials/GitSubmodules/article.html#submodules_trackbranch). If you aren't using git for this, you can simply download a .zip and extract it from [this link](https://github.com/sc2ad/beatsaber-hook) and place it in your root project directory.
 
 ### IL2CPP Headers
 
