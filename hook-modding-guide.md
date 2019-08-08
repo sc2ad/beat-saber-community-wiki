@@ -6,7 +6,7 @@
 Hopefully you are here because you want to know how to make your own hook mod with emulamer's [BeatOn](https://github.com/emulamer/BeatOn).
 While most of what I will cover (or hope to cover) should be applicable to generic hook modding (for any Unity game, really) this guide will be specific to BeatOn and Beat Saber.
 
-**I will not teach you how to program, but rather illustrate specific examples of common desirables and how to acheive them. Please read the warning below!**
+**I will not teach you how to program, but rather illustrate specific examples of common desirables and how to achieve them. Please read the warning below!**
 
 >WARNING! THIS IS NOT MEANT TO BE AN ENTIRELY BEGINNER FRIENDLY GUIDE! THIS GUIDE ASSUMES YOU HAVE SOME EXPERIENCE WITH MODDING, WHETHER IT BE THROUGH CODE OR NOT, AND IS NOT FOR THE FAINT OF HEART.
 >THIS GUIDE ALSO ASSUMES THAT YOU HAVE MODERATE UNDERSTANDING OF PROGRAMMING IN GENERAL, C++, GITHUB, AND A DECENT UNDERSTANDING OF HOW SOME STUFF IN BEAT SABER IS COMPILED. I WILL NOT BE TEACHING YOU HOW TO CODE!
@@ -92,7 +92,7 @@ Now, let me explain what each of these files is used for.
 
 The easiest to explain is the `main.cpp` file. This holds the code for mod, and is almost always the main thing you will be modifying when making changes to your mod.
 
-Next, we have `beatonmod.json`, which is simply the .json that allows for this mod to be installed via BeatOn. You may familarize yourself with the format if you so desire, but it probably won't make _too_ much sense just yet. I will talk more about this fomat once we have completed our mod.
+Next, we have `beatonmod.json`, which is simply the .json that allows for this mod to be installed via BeatOn. You may familiarize yourself with the format if you so desire, but it probably won't make _too_ much sense just yet. I will talk more about this format once we have completed our mod.
 
 Moving on, we have our next two files: `build.sh` and `build.bat`. These are hopefully self-explanatory: they build the .so for you, so when you want to build your mod, you can simply `cd` to your mod directory and run `build`.
 
@@ -128,7 +128,7 @@ And now we have a key known as `LOCAL_CFLAGS`, which is incredibly important. Wi
 
 `LOCAL_MODULE` is fairly straightforward; it's just the name of the library you are building. Once built, NDK will automatically prefix your .so with `lib`, so in this case, after a successful build, the resultant .so would be: `libtemplatemod.so`
 
-`LOCAL_CPPFLAGS` incidate what C++ flags to use. In this case, we are telling the C++ compiler to compile using C++20.
+`LOCAL_CPPFLAGS` indicates what C++ flags to use. In this case, we are telling the C++ compiler to compile using C++20.
 
 `LOCAL_SRC_FILES` is the 'meat' of the mod, which tells NDK which files to actually compile into a .so. You may notice some files that we haven't talked about yet, such as any of the `../beatsaber-hook` files. We will talk about these files (and how to obtain them) in the next step.
 
@@ -272,7 +272,7 @@ MAKE_HOOK(StretchableCube_Awake, StretchableCube_Awake_offset, void, void* self)
 
 First, we define an offset which we will need for making our hook. This is good practice, because when a new version is released, offsets will most likely be outdated and require changing. Having them at the top, or somewhere consistent will help you change these and avoid headaches.
 
-Next, we call the MAKE_HOOK macro, which requires us to speccify a name of the function we are hooking (can be any name we desire), the offset of the function, the return value (can be void), and the arguments (or none if there are no arguments)
+Next, we call the MAKE_HOOK macro, which requires us to specify a name of the function we are hooking (can be any name we desire), the offset of the function, the return value (can be void), and the arguments (or none if there are no arguments)
 
 So, what we have done above is create a hook called `StretchableCube_Awake` at the offset `0x12F05D4`, with a `void` return type, and one parameter `void* self`. Recall that the thing that matters when making hooks with parameters is that the _size_ of the parameters must match the original function. In this case, we are simply saying: "I want to hook a function at offset 0x12F05D4, which has a return type of void, and a single parameter which is 4 bytes long. I want to call this original function StretcableCube_Awake".
 
